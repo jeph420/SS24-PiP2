@@ -90,7 +90,7 @@ for epoch in range(num_epochs):
                 for data in train_loader:
                 ## Split the train_loader into inputs and targets (the inputs will be fed to the network)
                     inputs, targets, _, _= data
-                    
+
                 ## Feed the inputs to the network, and retrieve outputs (don't forget to reset the gradients)
                     optimizer.zero_grad()
                     outputs = model(inputs)
@@ -101,18 +101,18 @@ for epoch in range(num_epochs):
                     optimizer.step()
                 ## Collect batch-loss over the entire epoch - get average loss of the epoch.
                     batch_loss += loss
-            training_loss_averages.append(batch_loss/len(train_loader))
-            ### Iterate over the entire eval_data - compute and store the loss of the data.
-            model.eval()
-            batch_loss = 0
-            for _ in tqdm.tqdm(range(num_epochs), desc=f"   Evaluation...", ncols=100, leave=False):
-                for data in val_loader:
-                    ## Split the eval_loader into inputs and targets.
-                    inputs, targets, _, _= data
-                    
-                    ## Feed the inputs to the network, and retrieve outputs.
-                    outputs = model(inputs)
-                    ## Compute and accumilate the loss of the batch.
-                    loss = torch.nn.functional.cross_entropy(outputs, targets)
-                    batch_loss += loss
+                    training_loss_averages.append(batch_loss/len(train_loader))
+                ### Iterate over the entire eval_data - compute and store the loss of the data.
+                model.eval()
+                batch_loss = 0
+                for _ in tqdm.tqdm(range(num_epochs), desc=f"   Evaluation...", ncols=100, leave=False):
+                    for data in val_loader:
+                        ## Split the eval_loader into inputs and targets.
+                        inputs, targets, _, _= data
+                        
+                        ## Feed the inputs to the network, and retrieve outputs.
+                        outputs = model(inputs)
+                        ## Compute and accumilate the loss of the batch.
+                        loss = torch.nn.functional.cross_entropy(outputs, targets)
+                        batch_loss += loss
             eval_losses.append(batch_loss)
