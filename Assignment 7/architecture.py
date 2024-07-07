@@ -66,6 +66,9 @@ batch_size = 32
 split_size = len(data)//9
 train_split, test_split, val_split = 7*split_size, split_size, split_size
 
+set_seed(42)
+data_train, data_test, data_val = torch.utils.data.random_split(data, [train_split, test_split, val_split])
+
 ## Choose suitable Optimizer and No. Epochs
 optimizer = torch.optim.Adam(trainable_params, lr=1e-3, weight_decay=1e-4)
 num_epochs = 10
@@ -76,12 +79,18 @@ train_sample = torch.utils.data.SubsetRandomSampler(range(train_split))
 test_sample = torch.utils.data.SubsetRandomSampler(range(train_split, train_split+test_split))
 val_sample = torch.utils.data.SubsetRandomSampler(range(len(data)-val_split, len(data)))
 
-train_loader = DataLoader(data, batch_size, train_sample)
-test_loader = DataLoader(data, batch_size, test_sample)
-val_loader = DataLoader(data, batch_size, val_sample)
+train_loader = DataLoader(data_train, batch_size, train_sample)
+test_loader = DataLoader(data_test, batch_size, test_sample)
+val_loader = DataLoader(data_val, batch_size, val_sample)
 
-## Train and Validate the CNN model 
+#print(train_split, test_split, val_split)
+#print(len(data_train), len(data_test), len(data_val))
+#print(len(train_sample), len(test_sample), len(val_sample))
+#print(len(train_loader), len(test_loader), len(val_loader))
+
+# Train and Validate the CNN model 
 for epoch in range(num_epochs):
+        i = 0
         for _ in tqdm.tqdm(range(1), desc=f"Epoch {epoch}", ncols=100):
             model.train()
             batch_loss = 0
@@ -90,7 +99,8 @@ for epoch in range(num_epochs):
                 for data in train_loader:
                 ## Split the train_loader into inputs and targets (the inputs will be fed to the network)
                     inputs, targets, _, _= data
-
+                    print(i)
+                    i+=1
                 ## Feed the inputs to the network, and retrieve outputs (don't forget to reset the gradients)
                     optimizer.zero_grad()
                     outputs = model(inputs)
@@ -116,3 +126,4 @@ for epoch in range(num_epochs):
                         loss = torch.nn.functional.cross_entropy(outputs, targets)
                         batch_loss += loss
             eval_losses.append(batch_loss)
+        
