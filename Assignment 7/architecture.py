@@ -60,6 +60,7 @@ data = ds.ImagesDataset(image_dir="training_data", dtype=int)
 trainable_params = [i for i in model.parameters()]
 training_loss_averages = []
 eval_losses = []
+test_losses = []
 
 ## Create dataset splits for Training, Validation, and Testing
 batch_size = 32
@@ -67,7 +68,7 @@ split_size = len(data)//100
 train_split, test_split, val_split = 20*split_size, 7*split_size, 7*split_size
 
 set_seed(42)
-data_train, data_test, data_val, _ = torch.utils.data.random_split(data, [0.20, 0.07, 0.07, 0.66])
+data_train, data_test, data_val, _ = torch.utils.data.random_split(data, [0.15, 0.05, 0.05, 0.75])
 
 ## Choose suitable Optimizer and No. Epochs
 optimizer = torch.optim.Adam(trainable_params, lr=1e-3, weight_decay=1e-4)
@@ -130,5 +131,19 @@ for epoch in range(num_epochs):
         eval_losses.append(batch_loss)
         i+=1
 
+        batch_loss = 0
+        for data in test_loader:
+            ## Split the eval_loader into inputs and targets.
+            inputs, targets, _, _= data
+
+            ## Feed the inputs to the network, and retrieve outputs.
+            outputs = model(inputs)
+            ## Compute and accumilate the loss of the batch.
+            loss = torch.nn.functional.cross_entropy(outputs, targets)
+            batch_loss += loss#
+            
+        test_losses.append(test_losses)
+
 print(training_loss_averages[-5:])
 print(eval_losses[-5:])
+print(test_losses)
